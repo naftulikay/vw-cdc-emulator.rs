@@ -64,33 +64,29 @@ impl Event {
     /// The first two bytes will always be `0xCA` and `0x34`, the third byte is the command, and
     /// the final byte will be the inverse of the third byte for parity.
     pub fn deserialize(value: u32) -> Result<Self, io::Error> {
-        let [header0, header1, command, _parity] = value.to_ne_bytes();
+        let [header0, header1, command, parity] = value.to_ne_bytes();
 
         // test command header
         if [header0, header1] != EVENT_PREFIX {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
                 format!(
-                    "Invalid command prefix: {:X}:{:X}, expected CA:34.",
+                    "Invalid command prefix: {:02X}:{:02X}, expected CA:34.",
                     header0, header1
                 ),
             ));
         }
 
-        // FIXME test command integrity via parity bits, upstream example:
-        /*
-         * uint8_t get_command(uint32_t cmd) {
-         *     // test header
-         *     if (((cmd>>24) & 0xFF) == CDC_PREFIX1 && ((cmd>>16) & 0xFF) == CDC_PREFIX2) {
-         *         // test parity
-         *         if (((cmd>>8) & 0xFF) == (0xFF^((cmd) & 0xFF))) {
-         *             return (cmd>>8) & 0xFF;
-         *         }
-         *     }
-         *
-         *     return 0;
-         * }
-         */
+        // test command integrity via parity bits
+        if command != (!parity) {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!(
+                    "Parity check failed, command: {:02X}, parity: {:02X}, expecting parity {:02X}",
+                    command, parity, !command
+                ),
+            ));
+        }
 
         match command {
             0x05 => Ok(Event::Scan),
