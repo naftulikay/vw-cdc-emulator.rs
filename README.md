@@ -15,4 +15,4 @@ Licensed at your discretion under either:
 
  [avr-rfc]: https://github.com/rust-lang/rust/issues/44052
  [travis]: https://travis-ci.org/naftulikay/vw-cdc-emulator.rs
- [travis.svg]: https://travis-ci.org/naftulikay/vm-cdc-emulator.rs.svg?branch=master
+ [travis.svg]: https://travis-ci.org/naftulikay/vw-cdc-emulator.rs.svg?branch=master
